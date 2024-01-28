@@ -1,5 +1,8 @@
 package com.peuconomia;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class computeDepth {
 
     public static void main(String[] args) {
@@ -7,8 +10,10 @@ public class computeDepth {
 
         int[] expected = new int[]{9, 10, 8, 36};
 
-
-        printOutput(inputArrays, expected);
+        System.out.println("Without DSA");
+        printOutput(inputArrays, expected, computeDepth::computeDepth);
+        System.out.println("\nWith DSA");
+        printOutput(inputArrays, expected, computeDepth::computeDepthDSA);
     }
 
     public static int computeDepth(int n) {
@@ -82,12 +87,46 @@ public class computeDepth {
 
     }
 
+    public static int computeDepthDSA(int n) {
 
-    public static void printOutput(int[] inputs, int[] expected) {
+        if (n == 0) throw new IllegalArgumentException("n cannot be zero");
 
-        for (int i = 0; i < inputs.length; i++) {
-            System.out.printf("N: %-10d Expected: %-10d ComputeDepth: %-10d\n", inputs[i], expected[i], computeDepth(inputs[i]));
+        int depth = 0;
+
+        Set<Integer> set = new HashSet<>();
+
+        for(depth=1; depth<Integer.MAX_VALUE; depth++){
+            /// get the digits
+            int number = n * depth;
+
+            while(number!=0){
+                int digit = number % 10;
+                number /=10;
+
+                set.add(digit);
+
+                if(set.size()==10){
+                    set.clear();
+                    return  depth;
+                }
+            }
         }
 
+        return depth;
+
+
+    }
+
+
+    public static void printOutput(int[] inputs, int[] expected, DepthChecker checker) {
+
+        for (int i = 0; i < inputs.length; i++) {
+            System.out.printf("N: %-10d Expected: %-10d ComputeDepth: %-10d\n", inputs[i], expected[i], checker.check(inputs[i]));
+        }
+
+    }
+
+    private interface DepthChecker {
+        int check(int n);
     }
 }
